@@ -2,9 +2,6 @@
 Kaitlyn Lee, Sanaz Ebrahimi, Yoobin Won, Aron Ma, Dylan Fu
 
 
-
-This is a template repository for a group assignment to produce a descriptive analysis of class survey data.
-
 Your repository should contain:
 
 1) A brief .README summarizing repo content and listing the best references on your topic for a user to consult after reviewing your vignette if they wish to learn more
