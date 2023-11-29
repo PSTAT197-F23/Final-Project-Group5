@@ -1,0 +1,7 @@
+---
+title: "Clustering"
+author: 'Aron, Dylan, Kaitlyn, Sanaz, Yoobin'
+date: 12/6/2023
+---
+
+### Setup
