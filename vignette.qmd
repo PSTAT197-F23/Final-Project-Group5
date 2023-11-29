@@ -4,4 +4,13 @@ author: 'Aron, Dylan, Kaitlyn, Sanaz, Yoobin'
 date: 12/6/2023
 ---
 
+In this vignette, we will ....
+Objectives: ....
+
 ### Setup
+```{r}
+library(tidyverse)
+wine <- read_csv('data/winequality-white.csv')
+```
+
+### 
