@@ -1,10 +1,33 @@
 # Final-Project-Group5
-Kaitlyn Lee, Sanaz Ebrahimi, Yoobin Won, Aron Ma, Dylan Fu
 
+Vignette on implementing clustering methods (k-means and hierarchical) using the well known iris data; created as a class project for PSTAT197A in Fall 2023.
+
+**Contributors:** Kaitlyn Lee, Sanaz Ebrahimi, Yoobin Won, Aron Ma, Dylan Fu
+
+**Vignette abstract:** a brief description in a few sentences of your vignette topic, example data, and outcomes.
+
+**Repository contents:** In the root repository we have the `vignette.qmd` our primary vignette document that teaches the different clustering methods with step-by-step explanations (should read like a lab activity)
+
+-   `data`: contains `iris.csv` and corresponding `codebook.txt`
+
+-   `scripts`: contains a `drafts` folder and a `vignette-script.R` file
+
+    -   `drafts`: contains draft scripts for the different clustering methods
+    -   `vignette-script.R`: script compiling the code from the primary vignette document with line annotations
+
+-   `images` contains .png files of plots and output used in primary vignette document
+
+**Reference list:** 2 or more references to learn more about your topic.
+
+1.   [Clustering(K-Mean and Hierarchical) with Practical Implementation](https://medium.com/machine-learning-researcher/clustering-k-mean-and-hierarchical-cluster-fa2de08b4a4b)
+
+2.  [The Math Behind K-Means Clustering](https://medium.com/@draj0718/the-math-behind-k-means-clustering-4aa85532085e)
+
+3.  [Another article on the math for k-means](https://heartbeat.comet.ml/understanding-the-mathematics-behind-k-means-clustering-40e1d55e2f4c)
 
 Your repository should contain:
 
-1) A brief .README summarizing repo content and listing the best references on your topic for a user to consult after reviewing your vignette if they wish to learn more
-2) A primary vignette document that explains methods and walks through implementation line-by-line (similar to an in-class or lab activity)
-3) At least one example dataset
-4) A script containing commented codes appearing in the vignette
+1)  A brief .README summarizing repo content and listing the best references on your topic for a user to consult after reviewing your vignette if they wish to learn more
+2)  A primary vignette document that explains methods and walks through implementation line-by-line (similar to an in-class or lab activity)
+3)  At least one example dataset
+4)  A script containing commented codes appearing in the vignette
