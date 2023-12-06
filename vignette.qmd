@@ -4,8 +4,8 @@ author: 'Aron, Dylan, Kaitlyn, Sanaz, Yoobin'
 date: 12/6/2023
 ---
 
-In this vignette, we will ....
-Objectives: ....
+In this vignette, we will go over various clustering methods, going in detail into the methodology and the process to give you the tools to perform clustering for machine learning applications.
+Objectives: Learn clustering methods, when and why to use them. Introduce hierarchical clustering and compare the benefits and downsides.
 
 ### Setup
 ```{r}
