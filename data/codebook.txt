@@ -1,0 +1,10 @@
+Codebook for Iris dataset:
+---------------------------------------
+50 samples of each species of iris:
+    - Species: Setosa, virginica, versicolor
+
+Four features measured from each sample: 
+    - Sepal.Length: sepal length in cm
+    - Sepal.Width: sepal width in cm
+    - Petal.Length: petal length in cm
+    - Petal.Width: petal width in cm
