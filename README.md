@@ -4,7 +4,7 @@ Vignette on implementing clustering methods (k-means and hierarchical) using the
 
 **Contributors:** Kaitlyn Lee, Sanaz Ebrahimi, Yoobin Won, Aron Ma, Dylan Fu
 
-**Vignette abstract:** a brief description in a few sentences of your vignette topic, example data, and outcomes.
+**Vignette abstract:** This vignette guides you through the application of two key clustering algorithms, K-Means and Hierarchical clustering, using the Iris dataset. You will gain hands-on experience using pre-existing methods to cluster the data in R and visualizing the results. This notebook will equip you with practical skills to analyze and group data based on their inherent similarities.
 
 **Repository contents:** In the root repository we have the `vignette.qmd` our primary vignette document that teaches the different clustering methods with step-by-step explanations (should read like a lab activity)
 
