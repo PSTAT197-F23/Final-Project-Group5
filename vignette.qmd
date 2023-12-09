@@ -4,15 +4,90 @@ author: 'Aron, Dylan, Kaitlyn, Sanaz, Yoobin'
 date: 12/6/2023
 ---
 
-In this vignette, we will go over clustering methods, going in detail into the methodology and the process to give you the tools to perform clustering for machine learning applications. We will delve into K-means and heirarchical clustering, and we will talk about the reasons to use or not to use hierarchical clustering.
+In this vignette, we will go over clustering methods, going in detail into the methodology and the process to give you the tools to perform clustering for machine learning applications. We will delve into K-means and hierarchical clustering, and we will talk about the reasons to use or not to use hierarchical clustering.
 
 Objectives: Learn clustering methods, when and why to use them. Introduce hierarchical clustering and compare the benefits and downsides. Learn visualization methods such as dendograms.
 
-### Setup
-#Load the data set
+# Setup
+
+For this activity we will be using the `iris` dataset.
+
 ```{r}
 library(tidyverse)
-wine <- read_csv('data/iris.csv')
+library(ggplot2)
+set.seed(0)
+data("iris")
+iris %>% head(4)
 ```
 
-### 
+Your job is to sort the data into clusters using k-means and hierarchical clustering. The `Species` variable will not be used as it would have been the response for supervised methods. The other 4 variables will be used as predictors.
+
+# Clustering
+
+## K-means
+
+### Step 1: PCA
+
+Since we have more than 2 predictors, our first step will be to perform Principal Component Analysis to reduce the dimensionality of the data down to 2 axes.
+
+```{r}
+# Calculate the principal components using prcomp() function
+pca <- prcomp(iris[, -5], scale = TRUE)
+
+# Extract the scores for the first two principal components
+pc1 <- pca$x[, 1]
+pc2 <- pca$x[, 2]
+summary(pca)
+```
+
+We will be creating clusters using these components.
+
+Before that though, lets take a look at our data when plotted on these axes:
+
+```{r}
+iris_pca <- data.frame(cbind(pc1, pc2))
+colnames(iris_pca)[1:2] <- c("PC1", "PC2")
+
+# Create a scatter plot of the first two principal components
+ggplot(iris_pca, aes(x = PC1, y = PC2)) +
+  geom_point()
+```
+
+Visual observation is one way of choosing the number of clusters to use in k-means clustering. Based on this plot, we would likely choose 2 as our number of clusters. However, lets try a more rigorous method before making any decisions.
+
+### Step 2: Elbow Method
+
+Next, we need to select the number of clusters we will be grouping our data into. This is done using the elbow method. In the elbow method, we first vary the number of clusters and calculate the within-cluster sum of squares. Then, we plot the sum of squares and \# of clusters visually and find where the change in SS starts to level off, selecting that point as our chosen number of clusters.
+
+```{r}
+#calculate ss for each # of clusters 
+inertia<-c()
+for (i in 1:10){
+  m<-kmeans(iris_pca, centers = i)
+  inertia<-c(inertia,m$tot.withinss)
+}
+
+#plot data
+ggplot(data = NULL, aes(x = 1:10, y = inertia))+geom_line()+geom_point()+labs(title = "Elbow Plot", x = "n Clusters", y = "Within Cluster SS")+scale_x_continuous(breaks = pretty(1:10, n = 10))
+```
+
+As you can see, the change in SS seems to level off after 3. Therefore we will set our number of clusters for k-means as 3.
+
+### Step 3: Clustering
+
+K-means clustering works by repeatedly calculating the "mean" of each cluster, then assigning each data point to the closest "mean", repeating until the means/centroids no longer change.
+
+```{r}
+#cluster
+model<-kmeans(iris_pca, centers = 3)
+
+#create dataframe
+preds<-cbind(iris_pca, model$cluster)
+colnames(preds)[3]<-"Group"
+
+#plot clusters
+ggplot(preds, aes(x = PC1, y = PC2, color = as.factor(Group))) +
+  geom_point()+labs(title="Predicted Clusters")
+```
+
+We have successfully clustered our data using k-means clustering.
