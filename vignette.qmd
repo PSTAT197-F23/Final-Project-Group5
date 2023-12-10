@@ -77,7 +77,15 @@ As you can see, the change in SS seems to level off after 3. Therefore we will s
 
 ### Step 3: Clustering
 
-K-means clustering works by repeatedly calculating the "mean", or centroid, of each cluster, then assigning each data point to their closest centroid, repeating until the centroids no longer change.
+We will now be performing k-means clustering, which is a simple and efficient approach for breaking a dataset into distinct groups. The algorithm involves randomly assigning each observation to an initial cluster, then begins an iterative process of computing the centroid of each cluster and assigning each observation to the cluster with the closest centroid. The goal is to minimize the Euclidean distance, that is:
+
+![](images/euclidean-formula.png){fig-align="center" width="285" height="64"}
+
+where each $C_k$ is a cluster.
+
+The algorithm continues to iterate until the clusters no longer change, or until the maximum iterations are reached.
+
+We will now apply this k-means clustering method to our own dataset in order to group each flower into one of the three species.
 
 ```{r}
 #cluster
@@ -93,3 +101,7 @@ ggplot(preds, aes(x = PC1, y = PC2, color = as.factor(Group))) +
 ```
 
 We have successfully clustered our data using k-means clustering.
+
+## Hierarchical
+
+### Step 1:
