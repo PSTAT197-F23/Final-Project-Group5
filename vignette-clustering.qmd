@@ -110,22 +110,13 @@ ggplot(preds, aes(x = PC1, y = PC2, color = as.factor(Group))) +
 We have successfully clustered our data using k-means clustering.
 
 ## Hierarchical
-Unlike k-means clustering there is no pre-specified number of clusters to work with. There are two different ways to go about hierarchical clustering,agglomerative and divisive. Agglomerative hierarchical clustering where we follow more of a bottom up method. Each cluster will be its own cluster all the way down until all the clusters are merged into one on the dendogram tree. For divise clustering it is the opposite fashion where there is one big cluster at the top and it splits down into clusters that contain variables similar to eachother but different than the other clusters created around it(top-down). Another pro to using hierarchical clustering is that you can choose where to cut off the clusters on the dendogram tree. 
+Unlike k-means clustering there is no pre-specified number of clusters to work with. There are two different ways to go about hierarchical clustering,agglomerative and divisive. Agglomerative hierarchical clustering where we follow more of a bottom up method. Each cluster will be its own cluster all the way down until all the clusters are merged into one on the dendogram tree. For divisive clustering it is the opposite fashion where there is one big cluster at the top and it splits down into clusters that contain variables similar to eachother but different than the other clusters created around it(top-down). Another pro to using hierarchical clustering is that you can choose where to cut off the clusters on the dendogram tree. 
 
-<<<<<<< Updated upstream
-=======
-<<<<<<< HEAD
+
 Algorithim/ theory : We first want to create a distance matrix with the euclidean distance function. In finding similarities in clustering the question is always how much space between points is a good threshold, this will usually be determined by the shape of the cluster. Some methods for getting the threshold are: single linkage, complete linkage,centroid linkage,average linkage, ward linkage. 
-=======
->>>>>>> Stashed changes
-We will now utilize a different approach to this classification problem: hierarchical clustering.
 
-One of the major differences between k-means and hierarchical clustering is that hierarchical clustering does not require us to specify a number of clusters beforehand. Additionally, we are able to construct **dendrograms**, which are useful tree-based models of the observations.
 
-<<<<<<< Updated upstream
-=======
->>>>>>> d74ee873f36d11be6349bd3408ac2685f9c6259c
->>>>>>> Stashed changes
+
 ### Step 1:
 
 ```{r}
