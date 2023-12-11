@@ -17,7 +17,7 @@ Vignette on implementing clustering methods (k-means and hierarchical) using the
 
 -   `images` contains .png files of plots and output used in primary vignette document
 
-**Reference list:** 2 or more references to learn more about your topic.
+**Reference list:** The following are references pertaining to clustering.
 
 1.  [Clustering(K-Mean and Hierarchical) with Practical Implementation](https://medium.com/machine-learning-researcher/clustering-k-mean-and-hierarchical-cluster-fa2de08b4a4b)
 
