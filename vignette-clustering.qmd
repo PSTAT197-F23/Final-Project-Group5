@@ -4,24 +4,31 @@ author: 'Aron, Dylan, Kaitlyn, Sanaz, Yoobin'
 date: 12/6/2023
 ---
 
-In this vignette, we will go over clustering methods, going in detail into the methodology and the process to give you the tools to perform clustering for machine learning applications. We will delve into K-means and hierarchical clustering, and we will talk about the reasons to use or not to use hierarchical clustering.
+In this vignette, we will take a deep dive into clustering and explain the methodology and processes in order to give you the tools to perform clustering for machine learning applications. We will delve into K-means and hierarchical clustering, and we will talk about the reasons to use or not to use hierarchical clustering.
 
 Objectives: Learn clustering methods, when and why to use them. Introduce hierarchical clustering and compare the benefits and downsides. Learn visualization methods such as dendrograms.
 
 # Setup
 
-For this activity we will be using the `iris` dataset.
+For this activity we will be using the `iris` dataset. This dataset consists of measurements taken from three different species of iris flowers: Versicolor, Setosa, and Virginica.
+
+![](images/iris-flowers.png){fig-align="center" width="441"}
 
 ```{r}
+# packages:
 library(tidyverse)
 library(ggplot2)
+
 set.seed(0)
-#import data
+
+# import data:
 data("iris")
 iris %>% head(4)
 ```
 
-Your job is to sort the data into clusters using k-means and hierarchical clustering. The `Species` variable will not be used as it would have been the response for supervised methods. The other 4 variables will be used as predictors.
+The `iris` set is made up of 5 variables and 150 observations, with each observation being an iris flower. 4 of the variables give measurements of sepal length, sepal width, petal length, petal width. The last variable is `Species`, which we will not be using as it would have been the response variable for supervised methods. The other 4 variables will be used as predictors.
+
+Your job is to sort the data into clusters using k-means and hierarchical clustering.
 
 # Clustering
 
@@ -59,7 +66,7 @@ Visual observation is one way of choosing the number of clusters to use in k-mea
 
 ### Step 2: Elbow Method
 
-Next, we need to select the number of clusters we will be grouping our data into. This is done using the elbow method. In the elbow method, we first vary the number of clusters and calculate the within-cluster sum of squares. Then, we plot the sum of squares and \# of clusters visually and find where the change in SS starts to level off, selecting that point as our chosen number of clusters.
+K-means clustering requires us to pre-select the number of clusters we will be grouping our data into. This is done using the elbow method, in which we first vary the number of clusters and calculate the within-cluster sum of squares. Then, we plot the sum of squares and \# of clusters visually and find where the change in SS starts to level off, selecting that point as our chosen number of clusters.
 
 ```{r}
 #calculate ss for each # of clusters 
@@ -73,7 +80,7 @@ for (i in 1:10){
 ggplot(data = NULL, aes(x = 1:10, y = inertia))+geom_line()+geom_point()+labs(title = "Elbow Plot", x = "n Clusters", y = "Within Cluster SS")+scale_x_continuous(breaks = pretty(1:10, n = 10))
 ```
 
-As you can see, the change in SS seems to level off after 3. Therefore we will set our number of clusters for k-means as 3.
+As we can see, the change in SS seems to level off after 3. Therefore we will set our number of clusters for k-means as 3.
 
 ### Step 3: Clustering
 
@@ -104,4 +111,25 @@ We have successfully clustered our data using k-means clustering.
 
 ## Hierarchical
 
+We will now utilize a different approach to this classification problem: hierarchical clustering.
+
+One of the major differences between k-means and hierarchical clustering is that hierarchical clustering does not require us to specify a number of clusters beforehand. Additionally, we are able to construct **dendrograms**, which are useful tree-based models of the observations.
+
 ### Step 1:
+
+```{r}
+# cluster:
+clusters <- hclust(dist(iris[, 3:4]))
+
+# plot the dendrogram:
+plot(clusters)
+```
+
+```{r}
+# cut the tree at the desired number of clusters (3):
+cut <- cutree(clusters, 3)
+```
+
+```{r}
+table(cut, iris$Species)
+```
