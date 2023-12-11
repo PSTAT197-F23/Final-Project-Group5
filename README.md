@@ -26,3 +26,4 @@ Vignette on implementing clustering methods (k-means and hierarchical) using the
 3.  [Another article on the math for k-means](https://heartbeat.comet.ml/understanding-the-mathematics-behind-k-means-clustering-40e1d55e2f4c)
 
 
+4.  [Article for hierarchical clustering](https://www.learndatasci.com/glossary/hierarchical-clustering/)

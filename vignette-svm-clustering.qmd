@@ -1,0 +1,26 @@
+---
+title: "vignette-svm-clustering"
+format: html
+editor: visual
+---
+
+## Quarto
+
+Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+
+## Support Vector Machines
+
+In case a student was interested in supervised learning we decided to add support vector machines clustering because it is efficient in this work. It works better for two-class problems even if it can work with multi-variate class problems which is something to be aware of.
+
+```{r}
+1 + 1
+```
+
+You can add options to executable code like this
+
+```{r}
+#| echo: false
+2 * 2
+```
+
+The `echo: false` option disables the printing of code (only output is displayed).
