@@ -36,7 +36,7 @@ Your job is to sort the data into clusters using k-means and hierarchical cluste
 
 ### Step 1: PCA
 
-Since we have more than 2 predictors, our first step will be to perform Principal Component Analysis to reduce the dimensionality of the data down to 2 axes. Clustering is a unsupervised method, so to make our data compatible with this process we will extract the outcome variable to yield feasible results. 
+Since we have more than 2 predictors, our first step will be to perform Principal Component Analysis to reduce the dimensionality of the data down to 2 axes. Clustering is a unsupervised method, so to make our data compatible with this process we will extract the outcome variable to yield feasible results.
 
 ```{r}
 # Calculate the principal components using prcomp() function
@@ -110,28 +110,100 @@ ggplot(preds, aes(x = PC1, y = PC2, color = as.factor(Group))) +
 We have successfully clustered our data using k-means clustering.
 
 ## Hierarchical
-Unlike k-means clustering there is no pre-specified number of clusters to work with. There are two different ways to go about hierarchical clustering: agglomerative and divisive. Agglomerative hierarchical clustering where we follow more of a bottom up method. Each observation will be its own cluster all the way down until all the clusters are merged into one at the end. For divisive clustering it is the opposite fashion where there all the data is in one cluster at the top and it splits down into clusters that contain variables similar to eachother but different than the other clusters created around it(top-down). Another benefit to using hierarchical clustering is that you can choose where to cut off the clusters. 
 
+Unlike k-means clustering there is no pre-specified number of clusters to work with. There are two different ways to go about hierarchical clustering: agglomerative and divisive. Agglomerative hierarchical clustering where we follow more of a bottom up method. Each observation will be its own cluster all the way down until all the clusters are merged into one at the end. For divisive clustering it is the opposite fashion where there all the data is in one cluster at the top and it splits down into clusters that contain variables similar to eachother but different than the other clusters created around it(top-down). Another benefit to using hierarchical clustering is that you can choose where to cut off the clusters.
 
-Algorithm/ theory : We first want to create a distance matrix with the euclidean distance function. In finding similarities in clustering the question is always how much space between points is a good threshold, this will usually be determined by the shape of the cluster. Some methods for getting the threshold are: single linkage, complete linkage,centroid linkage,average linkage, ward linkage. 
+Algorithm/ theory: We first want to create a distance matrix with the euclidean distance function. In finding similarities in clustering the question is always how much space between points is a good threshold, this will usually be determined by the shape of the cluster. Some methods for getting the threshold are: single linkage, complete linkage,centroid linkage,average linkage, ward linkage.
 
+### Dendrograms:
 
-
-### Step 1:
+We will perform hierarchical clustering with the default linkage method, which is `complete`.
 
 ```{r}
-# cluster:
-clusters <- hclust(dist(iris[, 3:4]))
+# hierarchical clustering using default method:
+clusters_complete <- hclust(dist(iris[, 3:4]), method = 'complete')
 
 # plot the dendrogram:
-plot(clusters)
+plot(clusters_complete, main = 'Iris Cluster Dendrogram (Complete linkage)')
+abline(h = 3, col = 'red', lty = 'dashed')
 ```
+
+Agglomerative hierarchical clustering works from the bottom up, with each leaf at the bottom of the dendrogram representing an observation. Working up the tree, leaves that are similar to one another begin to fuse together to create branches. These branches fuse with similar branches, and this keeps continuing up the tree until all observations/branches are fused. Therefore, when we look at the dendrogram, we can tell how similar or different two observations are based off the height at which they fused together --- fusing at the bottom of the tree indicates similarity, while fusing higher up shows more dissimilarity.
+
+Recall that hierarchical clustering enables us to work with any number of clusters based off of a single dendrogram. In order to identify clusters, we can draw horizontal lines across the plot and observe the distinct branches that are made. This height controls the number of clusters we work with, which makes it similar to the value of K in k-means clustering. For example, in the figure above, we added a line at `height = 3`, which created 3 different clusters. However, if we were to cut at `height = 2`, we would end up with 4 groups.
+
+### Tree cutting:
+
+For our specific problem, a good choice would be to cut the tree in order to make 3 clusters, as indicated by our dendrogram as well as our prior knowledge of the number of iris species. We will now move forward with cutting the tree and assessing the clusters that result.
 
 ```{r}
 # cut the tree at the desired number of clusters (3):
-cut <- cutree(clusters, 3)
+cut_complete <- cutree(clusters_complete, 3)
+
+# observe results in table form:
+table(cut_complete, iris$Species)
 ```
 
+The above table shows that all 50 Setosa flowers were classified by cluster 1 and all 50 Virginica flowers were classified by cluster 2, but the algorithm struggled with Versicolor.
+
+For the sake of exploration, we can also see what would have happened if we decided to cut the tree to make 4 clusters:
+
 ```{r}
-table(cut, iris$Species)
+# cut tree for 4 clusters:
+cut_2 <- cutree(clusters, 4)
+
+table(cut_2, iris$Species)
 ```
+
+### Linkage methods:
+
+Before we try to improve the results of our classification, let us first dive into the workings behind the algorithm to see what is happening behind the scenes. The hierarchical clustering algorithm is an iterative process that starts at the bottom of the dendogram, with each of the n observation being its own cluster. The algorithm then merges the two most similar clusters, reducing the total count to n - 1 clusters. This process continues over and over, fusing the two clusters most similar to each other, until all observations are in a single cluster, which is seen in the top of the dendogram.
+
+The concept of linkage, as mentioned before, comes in to play to define the dissimilarity between two groups of observations. In our computations above, we were using the default `complete` method, which utilizes the maximal intercluster dissimilarity. Other common linkage methods are `single`, `average`, and `centroid`, which are described in the table below.
+
++:------------:+:------------------------------------------------------------------------------------------------------------------+
+| **Complete** | The distance between two clusters is the maximal distance between the farthest points in cluster 1 and 2.         |
+|              |                                                                                                                   |
+|              | $d_{12} = max(i,j) d(X_i, Y_j)$                                                                                   |
++--------------+-------------------------------------------------------------------------------------------------------------------+
+| **Single**   | The distance between two clusters is the minimal distance between the closets points in cluster 1 and 2.          |
+|              |                                                                                                                   |
+|              | $d_{12} = min(i,j) d(X_i, Y_j)$                                                                                   |
++--------------+-------------------------------------------------------------------------------------------------------------------+
+| **Average**  | The distance between two clusters is the average of the distances between all pairs of points in cluster 1 and 2. |
+|              |                                                                                                                   |
+|              | $d_{12} = \frac1{kl} \sum_{i=1}^k \sum_{i=1}^l d(X_i, Y_j)$                                                       |
++--------------+-------------------------------------------------------------------------------------------------------------------+
+| **Centroid** | The distance between two clusters is distance between the two mean vectors of clusters 1 and 2.                   |
+|              |                                                                                                                   |
+|              | $d_{12} = d(\bar{x}, \bar{y})$                                                                                    |
++--------------+-------------------------------------------------------------------------------------------------------------------+
+
+: Now that we have discussed the different linkage methods, let us try to improve our results by using a different method.
+
+### Final clustering:
+
+```{r}
+# hierarchical clustering using average method:
+clusters_average <- hclust(dist(iris[, 3:4]), method = 'average')
+
+# plot the dendrogram:
+plot(clusters_average, main = 'Iris Cluster Dendrogram (Average linkage)')
+abline(h = 1.3, col = 'red', lty = 'dashed')
+
+# cut the tree at the desired number of clusters (3):
+cut_average <- cutree(clusters_average, 3)
+
+# observe results in table form:
+table(cut_average, iris$Species)
+```
+
+As seen in the table, utilizing the `average` linkage method was much more successful in classifying the flowers. We can also visualize these results in the form of a plot:
+
+```{r}
+ggplot(iris, aes(Petal.Length, Petal.Width, color = Species)) + 
+  geom_point(alpha = 0.4, size = 3) + geom_point(col = cut_average) + 
+  scale_color_manual(values = c('black', 'red', 'green'))
+```
+
+conclusion of some kind....
