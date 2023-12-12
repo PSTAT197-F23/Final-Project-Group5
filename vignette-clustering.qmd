@@ -30,9 +30,7 @@ The `iris` set is made up of 5 variables and 150 observations, with each observa
 
 Your job is to sort the data into clusters using k-means and hierarchical clustering.
 
-# Clustering
-
-## K-means
+## K-means Clustering
 
 ### Step 1: PCA
 
@@ -109,7 +107,7 @@ ggplot(preds, aes(x = PC1, y = PC2, color = as.factor(Group))) +
 
 We have successfully clustered our data using k-means clustering.
 
-## Hierarchical
+## Hierarchical Clustering
 
 Unlike k-means clustering there is no pre-specified number of clusters to work with. There are two different ways to go about hierarchical clustering: agglomerative and divisive. Agglomerative hierarchical clustering where we follow more of a bottom up method. Each observation will be its own cluster all the way down until all the clusters are merged into one at the end. For divisive clustering it is the opposite fashion where there all the data is in one cluster at the top and it splits down into clusters that contain variables similar to eachother but different than the other clusters created around it(top-down). Another benefit to using hierarchical clustering is that you can choose where to cut off the clusters.
 
@@ -206,4 +204,4 @@ ggplot(iris, aes(Petal.Length, Petal.Width, color = Species)) +
   scale_color_manual(values = c('black', 'red', 'green'))
 ```
 
-We have now discussed and gone in detail about two types of clustering: K-means and hierarchical. Note the differences in their respective processes and consider the benefits of using one over the other. K-means requires a specified number of clusters, but is more computationally efficient. Hierarchical is customizable and reproducible, allowing for flexibility. 
+We have now discussed and gone in detail about two types of clustering: K-means and hierarchical. Note the differences in their respective processes and consider the benefits of using one over the other. K-means requires a specified number of clusters, but is more computationally efficient. Hierarchical is customizable and reproducible, allowing for flexibility.
