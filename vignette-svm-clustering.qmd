@@ -6,7 +6,7 @@ editor: visual
 
 ## Support Vector Machines
 
-In this vignette we will look into support vector machines(SVM). SVMS are handy for all classfication problems and have been modified to work in clustering. We will look at how this method performs using both the linear and radial kernal methods. Throughout the code walk through we will focus on why some things will be more of less efficient compared to k-means clustering done in the other clustering example.
+In this vignette we will look into support vector machines(SVM). SVMS are handy for all classification problems and have been modified to work in clustering. We will look at how this method performs using both the linear and radial kernel methods. Throughout the code walk through we will focus on why some things will be more of less efficient compared to k-means clustering done in the other clustering example.
 
 Objectives: Run support vector machines using both linear and radial kernels and running metrics on them.
 
@@ -36,7 +36,7 @@ data("iris")
 iris %>% head(4)
 ```
 
-We will split the data for svm predicting. We avoided stratifying there is no unbalanced proportioning within groups and then we cross validated with 5 folds because that is a common and appropriate value.
+We will split the data for SVM predicting. We avoided stratifying there is no unbalanced proportioning within groups and then we cross validated with 5 folds because that is a common and appropriate value.
 
 ```{r}
 iris_split <- initial_split(data=iris)
@@ -62,9 +62,11 @@ ggplot(iris_train, aes(Sepal.Length,Sepal.Width, color = Species)) +
 geom_point()
 ```
 
-We will first start with a linear kernel however let's first talk about why this might not work out. Looking at the plot comparing the sepal length and width on the outcome on species we can visually see there is no linear way to separate these clusters. In theory we need something with a higher dimensionality because we have a multivariate model. It is also good to note that in the context of the iris data set we were told that setosa is linearly seperable from versicolor and virginica but versicolor and virginica are not linearly separable from each other. It is always good to be comfortable with your data so that you do not take extra steps.
+We will first start with a linear kernel however let's first talk about why this might not work out. Looking at the plot comparing the sepal length and width on the outcome on species we can visually see there is no linear way to separate these clusters. In theory we need something with a higher dimensionality because we have a multivariate model. It is also good to note that in the context of the iris data set we were told that setosa is linearly separable from versicolor and virginica but versicolor and virginica are not linearly separable from each other. It is always good to be comfortable with your data so that you do not take extra steps. (below is the mathematical equation for a linear as well as a polynomial kernel)
 
-For a simpler classification dataset this will work out in your favor, for today we will just run it to show it will not be in our favor. In the recipe we will standardize all the variables and then use default values when tuning each of the 5 levels we have.
+![](images/equationssvm.pdf)
+
+For a simpler classification data set this will work out in your favor, for today we will just run it to show it will not be in our favor. In the recipe we will standardize all the variables and then use default values when tuning each of the 5 levels we have.
 
 ```{r}
 svm_rec <- recipe(Species ~ Petal.Length + Petal.Width + Sepal.Length + Sepal.Width,
@@ -86,7 +88,7 @@ svm_linear_res %>% autoplot()
 
 ```
 
-Contrary to former assumptions the roc-auc had its highest value at almost 1.0 which means it performed ideally. However, this perfect roc_auc and almost perfect accuracy could be attributed to overfitting if it is miscalculated.
+Contrary to former assumptions the roc-auc had its highest value at almost 1.0 which means it performed ideally. However, this perfect roc_auc and almost perfect accuracy could be attributed to over-fitting if it is miscalculated.
 
 Below we fit the linear kernel to the best metrics in case we want to show visualizations on it.
 
@@ -98,7 +100,7 @@ fit(iris_train)
 
 ## Radial Kernel
 
-Doing the same method however now using a radial kernel we actually get lower results for ROC_AUC and accuracy which is odd for a couple reasons. Radial kernels are for higher dimensional data which is what we have because we have a multiclass data set. On top of this our outcome classes are not all linearly separable and radial kernels can also deal with this.
+Doing the same method however now using a radial kernel we actually get lower results for ROC_AUC and accuracy which is odd for a couple reasons. Radial kernels are for higher dimensional data which is what we have because we have a multi-class data set. On top of this our outcome classes are not all linearly separable and radial kernels can also deal with this.
 
 ```{r}
 svm_rbf_spec <- svm_rbf(cost=tune()) %>%

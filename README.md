@@ -29,10 +29,10 @@ Vignette on implementing clustering methods (k-means and hierarchical) using the
 
 4.  [Article for hierarchical clustering](https://www.learndatasci.com/glossary/hierarchical-clustering/)
 <<<<<<< Updated upstream
-=======
+
 
 5. [SVM kernel distinguishing](https://www.kdnuggets.com/2016/06/select-support-vector-machine-kernels.html)
 
 6. [SVM explanation](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2099486/)
 
->>>>>>> Stashed changes
+7. [kernel functions](https://www.analyticsvidhya.com/blog/2021/07/svm-support-vector-machine-algorithm/)
