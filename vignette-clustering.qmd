@@ -206,4 +206,4 @@ ggplot(iris, aes(Petal.Length, Petal.Width, color = Species)) +
   scale_color_manual(values = c('black', 'red', 'green'))
 ```
 
-conclusion of some kind....
+We have now discussed and gone in detail about two types of clustering: K-means and hierarchical. Note the differences in their respective processes and consider the benefits of using one over the other. K-means requires a specified number of clusters, but is more computationally efficient. Hierarchical is customizable and reproducible, allowing for flexibility. 
