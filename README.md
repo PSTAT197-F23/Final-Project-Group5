@@ -4,9 +4,9 @@ Vignette on implementing clustering methods (k-means and hierarchical) using the
 
 **Contributors:** Kaitlyn Lee, Sanaz Ebrahimi, Yoobin Won, Aron Ma, Dylan Fu
 
-**Vignette abstract:** This vignette guides the reader through the application of two key clustering algorithms, K-Means and Hierarchical clustering, using the Iris dataset. The reader will gain hands-on experience with using builtin methods to cluster the data in R and visualizing the results. This notebook will equip the reader with practical skills to analyze and group data based on their inherent similarities.
+**Vignette abstract:** The clustering vignette guides the reader through the application of two key clustering algorithms, K-Means and Hierarchical clustering, using the Iris dataset. The reader will gain hands-on experience with using builtin methods to cluster the data in R and visualizing the results. The second vignette named vignette-svm-clustering will offer students another method for clustering that may be appropriate for simpler models. This notebook will equip the reader with practical skills to analyze and group data based on their inherent similarities.
 
-**Repository contents:** In the root repository we have the `vignette.qmd` our primary vignette document that teaches the different clustering methods with step-by-step explanations (should read like a lab activity)
+**Repository contents:** In the root repository we have the `vignette-clustering.qmd` our primary vignette document that teaches the different clustering methods with step-by-step explanations (should read like a lab activity)
 
 -   `data`: contains `iris.csv` and corresponding `codebook.txt`
 
@@ -14,7 +14,8 @@ Vignette on implementing clustering methods (k-means and hierarchical) using the
 
     -   `drafts`: contains draft scripts for the different clustering methods
     -   `vignette-script.R`: script compiling the code from the primary vignette document with line annotations
-
+    -   `svm.rmd`: script containing code from vignette-svm-clustering with line annotations
+    -   `pca_kmeans.rmd`: script containing pca code and annotations from primary vignette
 -   `images` contains .png files of plots and output used in primary vignette document
 
 **Reference list:** The following are references pertaining to clustering.
@@ -27,3 +28,11 @@ Vignette on implementing clustering methods (k-means and hierarchical) using the
 
 
 4.  [Article for hierarchical clustering](https://www.learndatasci.com/glossary/hierarchical-clustering/)
+<<<<<<< Updated upstream
+=======
+
+5. [SVM kernel distinguishing](https://www.kdnuggets.com/2016/06/select-support-vector-machine-kernels.html)
+
+6. [SVM explanation](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2099486/)
+
+>>>>>>> Stashed changes

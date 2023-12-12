@@ -1,0 +1,109 @@
+```{r}
+#load in all necessary packages 
+library(tidymodels)
+library(ISLR)
+library(ISLR2)
+library(tidyverse)
+library(glmnet)
+library(modeldata)
+library(kernlab)
+library(tidyclust)
+library(corrplot)
+tidymodels_prefer()
+```
+
+
+```{r}
+#set seed for no shifts and play with data
+library(tidyverse)
+library(ggplot2)
+set.seed(0)
+#import data
+data("iris")
+iris %>% head(4)
+```
+
+```{r}
+#split data and cross validate on folds 
+iris_split <- initial_split(data=iris)
+
+iris_train <- training(iris_split)
+iris_test <- testing(iris_split)
+
+iris_folds <- vfold_cv(iris_train,v=3)
+```
+
+```{r}
+#color coded clusters plotted here on petal length and width corr. on outcome  
+ggplot(iris_train, aes(Petal.Length, Petal.Width,Sepal.Length,Sepal.Width, color = Species)) +
+geom_point()
+```
+
+```{r}
+#color coded clusters plotted here on sepal length and width corr. on outcome  
+ggplot(iris_train, aes(Sepal.Length,Sepal.Width, color = Species)) +
+geom_point()
+```
+
+```{r}
+#create a recipe to run a linear kernal and check metrics 
+svm_rec <- recipe(Species ~ Petal.Length + Petal.Width + Sepal.Length + Sepal.Width,
+data = iris_train) %>%
+  step_normalize(all_predictors())
+svm_linear_spec <- svm_poly(degree = 1, cost = tune()) %>%
+  set_mode("classification") %>%
+  set_engine("kernlab")
+
+svm_linear_wkflow <- workflow() %>%
+  add_recipe(svm_rec) %>%
+  add_model(svm_linear_spec)
+
+svm_linear_grid <- grid_regular(cost(), degree(), levels = 3)
+
+svm_linear_res <- tune_grid(svm_linear_wkflow,
+                            iris_folds, svm_linear_grid)
+svm_linear_res %>% autoplot()
+```
+
+```{r}
+#fit the best value for the inear kernal in case we move forward with it 
+
+svm_best_linear <- select_best(svm_linear_res)
+svm_final_linear_fit <- finalize_workflow(svm_linear_wkflow, svm_best_linear) %>%
+fit(iris_train)
+
+```
+
+```{r}
+#run a radial kernal as well as its metrics
+svm_rbf_spec <- svm_rbf(cost=tune()) %>%
+  set_mode('classification') %>%
+  set_engine('kernlab')
+
+svm_rbf_wkflow <- workflow() %>%
+  add_recipe(svm_rec) %>%
+  add_model(svm_rbf_spec)
+
+svm_rbf_grid. <- grid_regular(cost(),levels=5)
+
+svm_rbf_res <- tune_grid(svm_rbf_wkflow,
+                         iris_folds,svm_rbf_grid)
+
+svm_rbf_res %>% autoplot()
+```
+
+```{r}
+#grab best metrics for radial kernal 
+svm_best_radial <- select_best(svm_rbf_res)
+svm_final_radial_fit <- finalize_workflow(svm_rbf_wkflow, svm_best_radial) %>%
+fit(iris_train)
+```
+
+```{r}
+#plot a confusion matrix of radial kernal 
+augment(svm_final_radial_fit, iris_test) %>%
+select(Species, starts_with(".pred")) %>%
+conf_mat(Species, .pred_class) %>%
+autoplot(type = "heatmap")
+```
+
