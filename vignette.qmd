@@ -10,7 +10,7 @@ execute:
   cache: true
 ---
 
-In this vignette, we will take a deep dive into clustering and explain the methodology and processes in order to give you the tools to perform clustering for machine learning applications. We will delve into K-means and hierarchical clustering, and we will talk about the reasons to use or not to use hierarchical clustering. We included an additional section on support vector machines for those interested in that clustering method.
+In this vignette, we will take a deep dive into clustering and explain the methodology and processes in order to give you the tools to perform clustering for machine learning applications. We will delve into K-means and hierarchical clustering, and we will talk about the reasons to use or not to use hierarchical clustering. We also included an additional section on support vector machines for those interested in that clustering method.
 
 **Objectives:** Learn clustering methods, when and why to use them. Introduce K-means and hierarchical clustering and compare the benefits and downsides. Learn visualization methods such as dendrograms.
 
@@ -45,6 +45,7 @@ The `iris` set is made up of 5 variables and 150 observations, with each observa
 
 ::: callout-important
 ## Action
+
 Your job is to sort the data into clusters using k-means and hierarchical clustering.
 :::
 
@@ -61,7 +62,8 @@ pca <- prcomp(iris[, -5], scale = TRUE)
 # Extract the scores for the first two principal components
 pc1 <- pca$x[, 1]
 pc2 <- pca$x[, 2]
-#get a summary of the components
+
+# get a summary of the components
 summary(pca)
 ```
 
@@ -82,7 +84,7 @@ Visual observation is one way of choosing the number of clusters to use in k-mea
 
 ### Step 2: Elbow Method
 
-K-means clustering requires us to pre-select the number of clusters we will be grouping our data into. This is done using the elbow method, in which we first vary the number of clusters and calculate the within-cluster sum of squares. Then, we plot the sum of squares and \# of clusters visually and find where the change in SS starts to level off, selecting that point as our chosen number of clusters.
+K-means clustering requires us to pre-select the number of clusters that we will be grouping our data into. This is done using the elbow method, in which we first vary the number of clusters and calculate the within-cluster sum of squares. Then, we plot the sum of squares and number of clusters visually in order to find where the change in SS starts to level off, selecting that point as our chosen number of clusters.
 
 ```{r}
 #calculate ss for each # of clusters 
@@ -127,18 +129,23 @@ We have successfully clustered our data using k-means clustering.
 
 ## Hierarchical Clustering
 
-Unlike k-means clustering there is no pre-specified number of clusters to work with. There are two different ways to go about hierarchical clustering: agglomerative and divisive.   
-- Agglomerative hierarchical clustering where we follow more of a bottom up method. Each observation will be its own cluster all the way down until all the clusters are merged into one at the end. 
-- For divisive clustering it is the opposite fashion where there all the data is in one cluster at the top and it splits down into clusters that contain variables similar to each other but different than the other clusters created around it (top-down). Another benefit to using hierarchical clustering is that you can choose where to cut off the clusters.
+We will now classify our data using a different method: hierarchical clustering.
+
+Unlike k-means clustering, there is no pre-specified number of clusters to work with, which can be an added benefit as you can choose where to cut off the clusters. There are two different ways to go about hierarchical clustering: agglomerative and divisive.
+
+-   Agglomerative hierarchical clustering follows a bottom-up method. Each observation will be its own cluster to start, and continues to fuse until all the clusters are merged into one at the end.
+
+-   Divisive clustering it is the opposite fashion where there all the data is in one cluster at the top and it splits down into clusters that contain variables similar to each other but different than the other clusters created around it (top-down).
 
 ::: callout-note
-## Algorithm:
-We first want to create a distance matrix with the euclidean distance function. In finding similarities in clustering the question is always how much space between points is a good threshold, this will usually be determined by the shape of the cluster. There are various methods for getting this threshold often referred to as linkage methods and they include:`single`, `complete`, `centroid`, `average`, and `ward`.
+### Algorithm:
+
+We first want to create a distance matrix with the euclidean distance function. In finding similarities in clustering the question is always how much space between points is a good threshold, this will usually be determined by the shape of the cluster. There are various methods for getting this threshold, often referred to as linkage methods, including `single`, `complete`, `centroid`, `average`, and `ward`.
 :::
 
 ### Dendrograms:
 
-We will perform hierarchical clustering with the default linkage method, which is `complete`.
+To start, we will perform hierarchical clustering with the default linkage method, which is `complete`.
 
 ```{r}
 # hierarchical clustering using default method:
@@ -149,14 +156,15 @@ plot(clusters_complete, main = 'Iris Cluster Dendrogram (Complete linkage)')
 abline(h = 3, col = 'red', lty = 'dashed')
 ```
 
-Agglomerative hierarchical clustering works from the bottom up, with each leaf at the bottom of the dendrogram representing an observation. Working up the tree, leaves that are similar to one another begin to fuse together to create branches. These branches fuse with similar branches, and this keeps continuing up the tree until all observations/branches are fused. 
+As mentioned before, agglomerative hierarchical clustering works from the bottom up, with each leaf at the bottom of the dendrogram representing an observation. Working up the tree, leaves that are similar to one another begin to fuse together to create branches. These branches fuse with similar branches, and this keeps continuing up the tree until all observations/branches are fused.
 
 ::: callout-note
-## Interpretation:
+### Interpretation:
+
 When we look at the dendrogram, we can tell how similar or different two observations are based off the height at which they fused together --- fusing at the bottom of the tree indicates similarity, while fusing higher up shows more dissimilarity.
 :::
 
-Recall that hierarchical clustering enables us to work with any number of clusters based off of a single dendrogram. In order to identify clusters, we can draw horizontal lines across the plot and observe the distinct branches that are made. This height controls the number of clusters we work with, which makes it similar to the value of K in k-means clustering. 
+Recall that hierarchical clustering enables us to work with any number of clusters based off of a single dendrogram. In order to identify clusters, we can draw horizontal lines across the plot and observe the distinct branches that are made. This height controls the number of clusters we work with, which makes it similar to the value of K in k-means clustering.
 
 For example, in the figure above, we added a line at `height = 3`, which created 3 different clusters. However, if we were to cut at `height = 2`, we would end up with 4 groups.
 
@@ -172,7 +180,7 @@ cut_complete <- cutree(clusters_complete, 3)
 table(cut_complete, iris$Species)
 ```
 
-The above table shows that all 50 Setosa flowers were classified by cluster 1 and all 50 Virginica flowers were classified by cluster 2, but the algorithm struggled with Versicolor.
+The above table shows that all 50 setosa flowers were classified by cluster 1 and all 50 virginica flowers were classified by cluster 2, but the algorithm struggled with versicolor.
 
 For the sake of exploration, we can also see what would have happened if we decided to cut the tree to make 4 clusters:
 
@@ -185,7 +193,7 @@ table(cut_2, iris$Species)
 
 ### Linkage methods:
 
-Before we try to improve the results of our classification, let us first dive into the workings behind the algorithm to see what is happening behind the scenes. 
+Before we try to improve the results of our classification, let us first dive into the workings behind the algorithm to see what is happening behind the scenes.
 
 The hierarchical clustering algorithm is an iterative process that starts at the bottom of the dendogram, with each of the n observation being its own cluster. The algorithm then merges the two most similar clusters, reducing the total count to `n - 1` clusters. This process continues over and over, fusing the two clusters most similar to each other, until all observations are in a single cluster, which is seen in the top of the dendogram.
 
@@ -196,7 +204,7 @@ The concept of linkage, as mentioned before, comes in to play to define the diss
 |              |                                                                                                                   |
 |              | $d_{12} = max(i,j) d(X_i, Y_j)$                                                                                   |
 +--------------+-------------------------------------------------------------------------------------------------------------------+
-| **Single**   | The distance between two clusters is the minimal distance between the closets points in cluster 1 and 2.          |
+| **Single**   | The distance between two clusters is the minimal distance between the closest points in cluster 1 and 2.          |
 |              |                                                                                                                   |
 |              | $d_{12} = min(i,j) d(X_i, Y_j)$                                                                                   |
 +--------------+-------------------------------------------------------------------------------------------------------------------+
@@ -228,7 +236,7 @@ cut_average <- cutree(clusters_average, 3)
 table(cut_average, iris$Species)
 ```
 
-As seen in the table, utilizing the `average` linkage method was much more successful in classifying the flowers. We can also visualize these results in the form of a plot:
+As seen in the table, utilizing the `average` linkage method was much more successful in classifying the flowers. It was able to correctly group everything except for 5 versicolors and 1 virginica. We can also visualize these results in the form of a plot:
 
 ```{r}
 ggplot(iris, aes(Petal.Length, Petal.Width, color = Species)) + 
@@ -236,14 +244,17 @@ ggplot(iris, aes(Petal.Length, Petal.Width, color = Species)) +
   scale_color_manual(values = c('black', 'red', 'green'))
 ```
 
+Note that points whose border color and fill color match were classified correctly.
+
 ::: callout-note
-## Takeaway
+### Takeaway
+
 We have now discussed and gone in detail about two types of clustering: K-means and hierarchical. Note the differences in their respective processes and consider the benefits of using one over the other. K-means requires a specified number of clusters, but is more computationally efficient. Hierarchical is customizable and reproducible, allowing for flexibility.
 :::
 
-## Additional Exploration: SVM  
+## Additional Exploration: SVM
 
-In this section we will look into support vector machines(SVM). SVMs are handy for all classification problems and have been modified to work in clustering. We will look at how this method performs using both the linear and radial kernel methods. Part of this section will focus on why the performance of the SVM is less efficient compared to k-means clustering performed in the first section.
+In this section, we will look into support vector machines (SVM). SVMs are handy for all classification problems and have been modified to work in clustering. We will look at how this method performs using both the linear and radial kernel methods. Part of this section will focus on why the performance of the SVM is less efficient compared to k-means clustering performed in the first section.
 
 ***Objectives:*** Run support vector machines using both linear and radial kernels and compare metrics.
 
@@ -258,7 +269,7 @@ iris_test <- testing(iris_split)
 iris_folds <- vfold_cv(iris_train,v=5)
 ```
 
-## Linear kernel fitting
+### Linear Kernel Fitting
 
 Before we get into applying kernel functions we will first make plots to visualize possible clusters. To explore how the different parts of the flower (sepal vs petal) can be used to categorize flower species we will plot the correlation between petal length and width and well as sepal length vs width on the species outcome.
 
@@ -272,18 +283,19 @@ ggplot(iris_train, aes(Sepal.Length,Sepal.Width, color = Species)) +
 geom_point()
 ```
 
-We will first start with a linear kernel however we must begin by addressing potential shortcomings. Looking at the plot comparing the sepal length and width on the outcome species we can visually see there is no linear boundary to separates these clusters. In theory we need something with a higher dimensionality to address the multivariate data. It is also good to note that in the context of the iris data set we were told that setosa is linearly separable from versicolor and virginica but versicolor and virginica are not linearly separable from each other. 
+We will first start with a linear kernel, but we must begin by addressing potential shortcomings. Looking at the plot comparing the sepal length and width on the outcome species, we can visually see there is no linear boundary to separate these clusters. In theory, we need something with a higher dimensionality to address the multivariate data. It is also good to note that in the context of the iris data set we were told that setosa is linearly separable from versicolor and virginica, but versicolor and virginica are not linearly separable from each other.
 
-In general it is important to begin by getting to know your data as it will give us insights on potential challenges and what to look out for during data exploration and cleaning.
+In general, it is important to begin by getting to know your data as it will give us insights on potential challenges and what to look out for during data exploration and cleaning.
 
 ::: callout-note
-## Common Kernel Functions for SVM
-- Linear: $k(x_1,x_2)=x_1\cdot x_2$  
-- Polynomial: $k(x_1,x_2) = (\gamma \ x_1\cdot x_2 + c)^d$  
-- Gaussian or radial basis: $k(x_1,x_2) = exp(-\gamma \|x_1-x_2\|^2)$
+### Common Kernel Functions for SVM
+
+-   Linear: $k(x_1,x_2)=x_1\cdot x_2$\
+-   Polynomial: $k(x_1,x_2) = (\gamma \ x_1\cdot x_2 + c)^d$\
+-   Gaussian or radial basis: $k(x_1,x_2) = exp(-\gamma \|x_1-x_2\|^2)$
 :::
 
-For a simpler classification data set this will work out in your favor, for today we will just run it to demonstrate a case when this method is not as appropriate. In the recipe we will standardize all the variables and then use default values when tuning each of the 5 levels we have.
+For a simpler classification data set this will work out in your favor, for today we will just run it to demonstrate a case when this method is not as appropriate. In the recipe, we will standardize all the variables and then use default values when tuning each of the 5 levels we have.
 
 ```{r}
 svm_rec <- recipe(Species ~ Petal.Length + Petal.Width + Sepal.Length + Sepal.Width,
@@ -316,7 +328,7 @@ fit(iris_train)
 
 ### Radial Kernel
 
-Doing the same method however now using a radial kernel we actually get lower results for ROC_AUC and accuracy which is odd for a couple reasons. Radial kernels work well  for higher dimensional data which is what we have (Iris is a multi-class data set). On top of this, our outcome classes are not all linearly separable and radial kernels are also able to address this.
+Doing the same method however now using a radial kernel we actually get lower results for ROC_AUC and accuracy which is odd for a couple reasons. Radial kernels work well for higher dimensional data which is what we have (Iris is a multi-class data set). On top of this, our outcome classes are not all linearly separable and radial kernels are also able to address this.
 
 ```{r}
 svm_rbf_spec <- svm_rbf(cost=tune()) %>%
@@ -353,6 +365,7 @@ autoplot(type = "heatmap")
 As we expected the confusion matrix displays inaccuracies in distinguishing virginica and versicolor (the two species that were not said to be linearly separated from the setosa species).
 
 ::: callout-note
-## Takeaway
+### Takeaway
+
 In conclusion this section of the lab shows that support vector machines are versatile but have a lot things to look out for when clustering compared to k-means. You have to be aware of your data and its context. You must take different steps for multi-class models for example how to visualize their results.
 :::

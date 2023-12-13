@@ -6,7 +6,7 @@
 
 **Vignette abstract:** The clustering vignette guides the reader through the application of two key clustering algorithms, K-Means and Hierarchical clustering, using the Iris dataset. The reader will gain hands-on experience with using built in methods to cluster the data in R and visualizing the results. We also included an additional section covering support vector machine for those interested in another method for clustering that is well suited for smaller datasets. This notebook will equip the reader with practical skills to analyze and group data based on their inherent similarities.
 
-**Repository contents:** In the root repository we have the `vignette.qmd` our primary vignette document that teaches the different clustering methods with step-by-step explanations.  
+**Repository contents:** In the root repository we have the `vignette.qmd` our primary vignette document that teaches the different clustering methods with step-by-step explanations. Additional respository contents include:
 
 -   `data`: contains `iris.csv` and corresponding `codebook.txt`
 
@@ -16,22 +16,25 @@
     -   `vignette-script.R`: script compiling the code from the primary vignette document with line-by-line annotations
     -   `svm.rmd`: script containing code from vignette-svm-clustering with line annotations
     -   `pca_kmeans.rmd`: script containing pca code and annotations from primary vignette
+
 -   `images` contains .png files of plots and output used in primary vignette document
 
 **Reference list:** The following are references pertaining to clustering.
 
-1.  [Clustering(K-Mean and Hierarchical) with Practical Implementation](https://medium.com/machine-learning-researcher/clustering-k-mean-and-hierarchical-cluster-fa2de08b4a4b)
+1.  [Clustering (K-Mean and Hierarchical) with Practical Implementation](https://medium.com/machine-learning-researcher/clustering-k-mean-and-hierarchical-cluster-fa2de08b4a4b)
 
-2.  [The Math Behind K-Means Clustering](https://medium.com/@draj0718/the-math-behind-k-means-clustering-4aa85532085e)
+2.  [*An Introduction to Statistical Learning with Applications in R*](https://www.statlearning.com/)*,* James et. al.
 
-3.  [Another article on the math for k-means](https://heartbeat.comet.ml/understanding-the-mathematics-behind-k-means-clustering-40e1d55e2f4c)
+3.  [Agglomerative Hierarchical Clustering](https://online.stat.psu.edu/stat505/lesson/14/14.4)
 
+4.  [The Math Behind K-Means Clustering](https://medium.com/@draj0718/the-math-behind-k-means-clustering-4aa85532085e)
 
-4.  [Article for hierarchical clustering](https://www.learndatasci.com/glossary/hierarchical-clustering/)
+5.  [Another article on the math for k-means](https://heartbeat.comet.ml/understanding-the-mathematics-behind-k-means-clustering-40e1d55e2f4c)
 
+6.  [Article for hierarchical clustering](https://www.learndatasci.com/glossary/hierarchical-clustering/)
 
-5. [SVM kernel distinguishing](https://www.kdnuggets.com/2016/06/select-support-vector-machine-kernels.html)
+7.  [SVM kernel distinguishing](https://www.kdnuggets.com/2016/06/select-support-vector-machine-kernels.html)
 
-6. [SVM explanation](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2099486/)
+8.  [SVM explanation](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2099486/)
 
-7. [kernel functions](https://www.analyticsvidhya.com/blog/2021/07/svm-support-vector-machine-algorithm/)
+9.  [kernel functions](https://www.analyticsvidhya.com/blog/2021/07/svm-support-vector-machine-algorithm/)
