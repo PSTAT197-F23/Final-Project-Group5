@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.433">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Kaitlyn Lee, Sanaz Ebrahimi, Yoobin Won, Aron Ma, Dylan Fu">
+<meta name="dcterms.date" content="2023-12-12">
+
+<title>Clustering Methods</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="vignette_files/libs/clipboard/clipboard.min.js"></script>
+<script src="vignette_files/libs/quarto-html/quarto.js"></script>
+<script src="vignette_files/libs/quarto-html/popper.min.js"></script>
+<script src="vignette_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="vignette_files/libs/quarto-html/anchor.min.js"></script>
+<link href="vignette_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="vignette_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="vignette_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="vignette_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="vignette_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Clustering Methods</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Kaitlyn Lee, Sanaz Ebrahimi, Yoobin Won, Aron Ma, Dylan Fu </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">December 12, 2023</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+</header>
+
+<p>In this vignette, we will take a deep dive into clustering and explain the methodology and processes in order to give you the tools to perform clustering for machine learning applications. We will delve into K-means and hierarchical clustering, and we will talk about the reasons to use or not to use hierarchical clustering. We included an additional section on support vector machines for those interested in that clustering method.</p>
+<p><strong>Objectives:</strong> Learn clustering methods, when and why to use them. Introduce K-means and hierarchical clustering and compare the benefits and downsides. Learn visualization methods such as dendrograms.</p>
+<section id="setup" class="level2">
+<h2 class="anchored" data-anchor-id="setup">Setup</h2>
+<p>For this activity we will be using the <code>iris</code> dataset. This dataset consists of measurements taken from three different species of iris flowers: Versicolor, Setosa, and Virginica.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/iris-flowers.png" class="img-fluid figure-img" width="441"></p>
+</figure>
+</div>
+<div class="cell" data-hash="vignette_cache/html/unnamed-chunk-1_0592ffc3f9e32cab2c1e92b7e6575fdf">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># packages:</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidymodels)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ISLR)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ISLR2)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(glmnet)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(modeldata)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(kernlab)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyclust)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(corrplot)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">tidymodels_prefer</span>()</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">0</span>)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co"># import data:</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"iris"</span>)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>iris <span class="sc">%&gt;%</span> <span class="fu">head</span>(<span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+1          5.1         3.5          1.4         0.2  setosa
+2          4.9         3.0          1.4         0.2  setosa
+3          4.7         3.2          1.3         0.2  setosa
+4          4.6         3.1          1.5         0.2  setosa</code></pre>
+</div>
+</div>
+<p>The <code>iris</code> set is made up of 5 variables and 150 observations, with each observation being an iris flower. 4 of the variables give measurements of sepal length, sepal width, petal length, petal width. The last variable is <code>Species</code>, which we will not be using as it would have been the response variable for supervised methods. The other 4 variables will be used as predictors.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Action
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Your job is to sort the data into clusters using k-means and hierarchical clustering.</p>
+</div>
+</div>
+</section>
+<section id="k-means-clustering" class="level2">
+<h2 class="anchored" data-anchor-id="k-means-clustering">K-means Clustering</h2>
+<section id="step-1-pca" class="level3">
+<h3 class="anchored" data-anchor-id="step-1-pca">Step 1: PCA</h3>
+<p>Since we have more than 2 predictors, our first step will be to perform Principal Component Analysis to reduce the dimensionality of the data down to 2 axes. Clustering is a unsupervised method, so to make our data compatible with this process we will extract the outcome variable to yield feasible results.</p>
+<div class="cell" data-hash="vignette_cache/html/unnamed-chunk-2_48d4c246cb3f2ba556e45cf3d12c2f97">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate the principal components using prcomp() function</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>pca <span class="ot">&lt;-</span> <span class="fu">prcomp</span>(iris[, <span class="sc">-</span><span class="dv">5</span>], <span class="at">scale =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract the scores for the first two principal components</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>pc1 <span class="ot">&lt;-</span> pca<span class="sc">$</span>x[, <span class="dv">1</span>]</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>pc2 <span class="ot">&lt;-</span> pca<span class="sc">$</span>x[, <span class="dv">2</span>]</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co">#get a summary of the components</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(pca)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Importance of components:
+                          PC1    PC2     PC3     PC4
+Standard deviation     1.7084 0.9560 0.38309 0.14393
+Proportion of Variance 0.7296 0.2285 0.03669 0.00518
+Cumulative Proportion  0.7296 0.9581 0.99482 1.00000</code></pre>
+</div>
+</div>
+<p>We will be creating clusters using these components.</p>
+<p>Before that, lets take a look at our data when plotted on the axes given by the components:</p>
+<div class="cell" data-hash="vignette_cache/html/unnamed-chunk-3_44cf3f2fe3f80bd0651ce4ca842bada6">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>iris_pca <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="fu">cbind</span>(pc1, pc2))</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(iris_pca)[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"PC1"</span>, <span class="st">"PC2"</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a scatter plot of the first two principal components</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(iris_pca, <span class="fu">aes</span>(<span class="at">x =</span> PC1, <span class="at">y =</span> PC2)) <span class="sc">+</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="vignette_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Visual observation is one way of choosing the number of clusters to use in k-means clustering. Based on this plot, we would likely choose 2 as our number of clusters. However, lets try a more rigorous method before making any decisions.</p>
+</section>
+<section id="step-2-elbow-method" class="level3">
+<h3 class="anchored" data-anchor-id="step-2-elbow-method">Step 2: Elbow Method</h3>
+<p>K-means clustering requires us to pre-select the number of clusters we will be grouping our data into. This is done using the elbow method, in which we first vary the number of clusters and calculate the within-cluster sum of squares. Then, we plot the sum of squares and # of clusters visually and find where the change in SS starts to level off, selecting that point as our chosen number of clusters.</p>
+<div class="cell" data-hash="vignette_cache/html/unnamed-chunk-4_488cee29d8949c3b1ab1e11cb59f02c2">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">#calculate ss for each # of clusters </span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>inertia<span class="ot">&lt;-</span><span class="fu">c</span>()</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>){</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  m<span class="ot">&lt;-</span><span class="fu">kmeans</span>(iris_pca, <span class="at">centers =</span> i) <span class="co"># perform clustering</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  inertia<span class="ot">&lt;-</span><span class="fu">c</span>(inertia,m<span class="sc">$</span>tot.withinss)<span class="co"># get within cluster SS for that k </span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co">#plot data</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> <span class="cn">NULL</span>, <span class="fu">aes</span>(<span class="at">x =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, <span class="at">y =</span> inertia))<span class="sc">+</span><span class="fu">geom_line</span>()<span class="sc">+</span><span class="fu">geom_point</span>()<span class="sc">+</span><span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Elbow Plot"</span>, <span class="at">x =</span> <span class="st">"n Clusters"</span>, <span class="at">y =</span> <span class="st">"Within Cluster SS"</span>)<span class="sc">+</span><span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="fu">pretty</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, <span class="at">n =</span> <span class="dv">10</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="vignette_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>As we can see, the change in SS seems to level off after 3. Therefore we will set our number of clusters for k-means as 3.</p>
+</section>
+<section id="step-3-clustering" class="level3">
+<h3 class="anchored" data-anchor-id="step-3-clustering">Step 3: Clustering</h3>
+<p>We will now be performing k-means clustering, which is a simple and efficient approach for breaking a dataset into distinct groups. The algorithm involves randomly assigning each observation to an initial cluster, then begins an iterative process of computing the centroid of each cluster and assigning each observation to the cluster with the closest centroid. The goal is to minimize the Euclidean distance, that is:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/euclidean-formula.png" width="285" height="64" class="figure-img"></p>
+</figure>
+</div>
+<p>where each <span class="math inline">\(C_k\)</span> is a cluster.</p>
+<p>The algorithm continues to iterate until the clusters no longer change, or until the maximum iterations are reached.</p>
+<p>We will now apply this k-means clustering method to our own dataset in order to group each flower into one of the three species.</p>
+<div class="cell" data-hash="vignette_cache/html/unnamed-chunk-5_c791749be75fca24fe5de1364e913820">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">#cluster</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>model<span class="ot">&lt;-</span><span class="fu">kmeans</span>(iris_pca, <span class="at">centers =</span> <span class="dv">3</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co">#create dataframe</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>preds<span class="ot">&lt;-</span><span class="fu">cbind</span>(iris_pca, model<span class="sc">$</span>cluster)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(preds)[<span class="dv">3</span>]<span class="ot">&lt;-</span><span class="st">"Group"</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co">#plot clusters</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(preds, <span class="fu">aes</span>(<span class="at">x =</span> PC1, <span class="at">y =</span> PC2, <span class="at">color =</span> <span class="fu">as.factor</span>(Group))) <span class="sc">+</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()<span class="sc">+</span><span class="fu">labs</span>(<span class="at">title=</span><span class="st">"Predicted Clusters"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="vignette_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>We have successfully clustered our data using k-means clustering.</p>
+</section>
+</section>
+<section id="hierarchical-clustering" class="level2">
+<h2 class="anchored" data-anchor-id="hierarchical-clustering">Hierarchical Clustering</h2>
+<p>Unlike k-means clustering there is no pre-specified number of clusters to work with. There are two different ways to go about hierarchical clustering: agglomerative and divisive.<br>
+- Agglomerative hierarchical clustering where we follow more of a bottom up method. Each observation will be its own cluster all the way down until all the clusters are merged into one at the end. - For divisive clustering it is the opposite fashion where there all the data is in one cluster at the top and it splits down into clusters that contain variables similar to each other but different than the other clusters created around it (top-down). Another benefit to using hierarchical clustering is that you can choose where to cut off the clusters.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Algorithm:
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>We first want to create a distance matrix with the euclidean distance function. In finding similarities in clustering the question is always how much space between points is a good threshold, this will usually be determined by the shape of the cluster. There are various methods for getting this threshold often referred to as linkage methods and they include:<code>single</code>, <code>complete</code>, <code>centroid</code>, <code>average</code>, and <code>ward</code>.</p>
+</div>
+</div>
+<section id="dendrograms" class="level3">
+<h3 class="anchored" data-anchor-id="dendrograms">Dendrograms:</h3>
+<p>We will perform hierarchical clustering with the default linkage method, which is <code>complete</code>.</p>
+<div class="cell" data-hash="vignette_cache/html/unnamed-chunk-6_c9145bc3f4263a17216d4c1a60fc1885">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># hierarchical clustering using default method:</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>clusters_complete <span class="ot">&lt;-</span> <span class="fu">hclust</span>(<span class="fu">dist</span>(iris[, <span class="dv">3</span><span class="sc">:</span><span class="dv">4</span>]), <span class="at">method =</span> <span class="st">'complete'</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># plot the dendrogram:</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(clusters_complete, <span class="at">main =</span> <span class="st">'Iris Cluster Dendrogram (Complete linkage)'</span>)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h =</span> <span class="dv">3</span>, <span class="at">col =</span> <span class="st">'red'</span>, <span class="at">lty =</span> <span class="st">'dashed'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="vignette_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Agglomerative hierarchical clustering works from the bottom up, with each leaf at the bottom of the dendrogram representing an observation. Working up the tree, leaves that are similar to one another begin to fuse together to create branches. These branches fuse with similar branches, and this keeps continuing up the tree until all observations/branches are fused.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Interpretation:
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>When we look at the dendrogram, we can tell how similar or different two observations are based off the height at which they fused together — fusing at the bottom of the tree indicates similarity, while fusing higher up shows more dissimilarity.</p>
+</div>
+</div>
+<p>Recall that hierarchical clustering enables us to work with any number of clusters based off of a single dendrogram. In order to identify clusters, we can draw horizontal lines across the plot and observe the distinct branches that are made. This height controls the number of clusters we work with, which makes it similar to the value of K in k-means clustering.</p>
+<p>For example, in the figure above, we added a line at <code>height = 3</code>, which created 3 different clusters. However, if we were to cut at <code>height = 2</code>, we would end up with 4 groups.</p>
+</section>
+<section id="tree-cutting" class="level3">
+<h3 class="anchored" data-anchor-id="tree-cutting">Tree cutting:</h3>
+<p>For our specific problem, a good choice would be to cut the tree in order to make 3 clusters, as indicated by our dendrogram as well as our prior knowledge of the number of iris species. We will now move forward with cutting the tree and assessing the clusters that result.</p>
+<div class="cell" data-hash="vignette_cache/html/unnamed-chunk-7_01d8ebcadd21b1b81974da85ce941b97">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># cut the tree at the desired number of clusters (3):</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>cut_complete <span class="ot">&lt;-</span> <span class="fu">cutree</span>(clusters_complete, <span class="dv">3</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co"># observe results in table form:</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(cut_complete, iris<span class="sc">$</span>Species)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>            
+cut_complete setosa versicolor virginica
+           1     50          0         0
+           2      0         21        50
+           3      0         29         0</code></pre>
+</div>
+</div>
+<p>The above table shows that all 50 Setosa flowers were classified by cluster 1 and all 50 Virginica flowers were classified by cluster 2, but the algorithm struggled with Versicolor.</p>
+<p>For the sake of exploration, we can also see what would have happened if we decided to cut the tree to make 4 clusters:</p>
+<div class="cell" data-hash="vignette_cache/html/unnamed-chunk-8_199ce1792fdd10427f5088a0fdce4b1d">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># cut tree for 4 clusters:</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>cut_2 <span class="ot">&lt;-</span> <span class="fu">cutree</span>(clusters_complete, <span class="dv">4</span>)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(cut_2, iris<span class="sc">$</span>Species)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     
+cut_2 setosa versicolor virginica
+    1     50          0         0
+    2      0         21        31
+    3      0         29         0
+    4      0          0        19</code></pre>
+</div>
+</div>
+</section>
+<section id="linkage-methods" class="level3">
+<h3 class="anchored" data-anchor-id="linkage-methods">Linkage methods:</h3>
+<p>Before we try to improve the results of our classification, let us first dive into the workings behind the algorithm to see what is happening behind the scenes.</p>
+<p>The hierarchical clustering algorithm is an iterative process that starts at the bottom of the dendogram, with each of the n observation being its own cluster. The algorithm then merges the two most similar clusters, reducing the total count to <code>n - 1</code> clusters. This process continues over and over, fusing the two clusters most similar to each other, until all observations are in a single cluster, which is seen in the top of the dendogram.</p>
+<p>The concept of linkage, as mentioned before, comes in to play to define the dissimilarity between two groups of observations. In our computations above, we were using the default <code>complete</code> method, which utilizes the maximal intercluster dissimilarity. Other common linkage methods are <code>single</code>, <code>average</code>, and <code>centroid</code>, which are described in the table below.</p>
+<table class="table">
+<caption>Now that we have discussed the different linkage methods, let us try to improve our results by using a different method.</caption>
+<colgroup>
+<col style="width: 11%">
+<col style="width: 88%">
+</colgroup>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;"><strong>Complete</strong></td>
+<td style="text-align: left;"><p>The distance between two clusters is the maximal distance between the farthest points in cluster 1 and 2.</p>
+<p><span class="math inline">\(d_{12} = max(i,j) d(X_i, Y_j)\)</span></p></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><strong>Single</strong></td>
+<td style="text-align: left;"><p>The distance between two clusters is the minimal distance between the closets points in cluster 1 and 2.</p>
+<p><span class="math inline">\(d_{12} = min(i,j) d(X_i, Y_j)\)</span></p></td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;"><strong>Average</strong></td>
+<td style="text-align: left;"><p>The distance between two clusters is the average of the distances between all pairs of points in cluster 1 and 2.</p>
+<p><span class="math inline">\(d_{12} = \frac1{kl} \sum_{i=1}^k \sum_{i=1}^l d(X_i, Y_j)\)</span></p></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><strong>Centroid</strong></td>
+<td style="text-align: left;"><p>The distance between two clusters is distance between the two mean vectors of clusters 1 and 2.</p>
+<p><span class="math inline">\(d_{12} = d(\bar{x}, \bar{y})\)</span></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="final-clustering" class="level3">
+<h3 class="anchored" data-anchor-id="final-clustering">Final clustering:</h3>
+<div class="cell" data-hash="vignette_cache/html/unnamed-chunk-9_92b82fb65f9eaf897c41aa2dfe9fa642">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># hierarchical clustering using average method:</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>clusters_average <span class="ot">&lt;-</span> <span class="fu">hclust</span>(<span class="fu">dist</span>(iris[, <span class="dv">3</span><span class="sc">:</span><span class="dv">4</span>]), <span class="at">method =</span> <span class="st">'average'</span>)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co"># plot the dendrogram:</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(clusters_average, <span class="at">main =</span> <span class="st">'Iris Cluster Dendrogram (Average linkage)'</span>)</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h =</span> <span class="fl">1.3</span>, <span class="at">col =</span> <span class="st">'red'</span>, <span class="at">lty =</span> <span class="st">'dashed'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="vignette_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># cut the tree at the desired number of clusters (3):</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>cut_average <span class="ot">&lt;-</span> <span class="fu">cutree</span>(clusters_average, <span class="dv">3</span>)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co"># observe results in table form:</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(cut_average, iris<span class="sc">$</span>Species)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>           
+cut_average setosa versicolor virginica
+          1     50          0         0
+          2      0         45         1
+          3      0          5        49</code></pre>
+</div>
+</div>
+<p>As seen in the table, utilizing the <code>average</code> linkage method was much more successful in classifying the flowers. We can also visualize these results in the form of a plot:</p>
+<div class="cell" data-hash="vignette_cache/html/unnamed-chunk-10_f6139c5d17a8088f1409c3dd18b5885a">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(iris, <span class="fu">aes</span>(Petal.Length, Petal.Width, <span class="at">color =</span> Species)) <span class="sc">+</span> </span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.4</span>, <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span> <span class="fu">geom_point</span>(<span class="at">col =</span> cut_average) <span class="sc">+</span> </span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">'black'</span>, <span class="st">'red'</span>, <span class="st">'green'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="vignette_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Takeaway
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>We have now discussed and gone in detail about two types of clustering: K-means and hierarchical. Note the differences in their respective processes and consider the benefits of using one over the other. K-means requires a specified number of clusters, but is more computationally efficient. Hierarchical is customizable and reproducible, allowing for flexibility.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="additional-exploration-svm" class="level2">
+<h2 class="anchored" data-anchor-id="additional-exploration-svm">Additional Exploration: SVM</h2>
+<p>In this section we will look into support vector machines(SVM). SVMs are handy for all classification problems and have been modified to work in clustering. We will look at how this method performs using both the linear and radial kernel methods. Part of this section will focus on why the performance of the SVM is less efficient compared to k-means clustering performed in the first section.</p>
+<p><strong><em>Objectives:</em></strong> Run support vector machines using both linear and radial kernels and compare metrics.</p>
+<p>We will split the data for SVM predicting. Since our data is not unbalanced in terms of proportions of values within groups. We will also perform cross validation with 5 folds since it is a common and appropriate value.</p>
+<div class="cell" data-hash="vignette_cache/html/unnamed-chunk-11_cdf954fe2b5869216b4e9c79c9c067b3">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>iris_split <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(<span class="at">data=</span>iris)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>iris_train <span class="ot">&lt;-</span> <span class="fu">training</span>(iris_split)</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>iris_test <span class="ot">&lt;-</span> <span class="fu">testing</span>(iris_split)</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>iris_folds <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(iris_train,<span class="at">v=</span><span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="linear-kernel-fitting" class="level2">
+<h2 class="anchored" data-anchor-id="linear-kernel-fitting">Linear kernel fitting</h2>
+<p>Before we get into applying kernel functions we will first make plots to visualize possible clusters. To explore how the different parts of the flower (sepal vs petal) can be used to categorize flower species we will plot the correlation between petal length and width and well as sepal length vs width on the species outcome.</p>
+<div class="cell" data-hash="vignette_cache/html/unnamed-chunk-12_1c02730f720310007f8f3cbefb2d58e7">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(iris_train, <span class="fu">aes</span>(Petal.Length, Petal.Width, <span class="at">color =</span> Species)) <span class="sc">+</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">geom_point</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="vignette_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell" data-hash="vignette_cache/html/unnamed-chunk-13_e184ce32bb67825b4615d42e8c3e0d5f">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(iris_train, <span class="fu">aes</span>(Sepal.Length,Sepal.Width, <span class="at">color =</span> Species)) <span class="sc">+</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">geom_point</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="vignette_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>We will first start with a linear kernel however we must begin by addressing potential shortcomings. Looking at the plot comparing the sepal length and width on the outcome species we can visually see there is no linear boundary to separates these clusters. In theory we need something with a higher dimensionality to address the multivariate data. It is also good to note that in the context of the iris data set we were told that setosa is linearly separable from versicolor and virginica but versicolor and virginica are not linearly separable from each other.</p>
+<p>In general it is important to begin by getting to know your data as it will give us insights on potential challenges and what to look out for during data exploration and cleaning.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Common Kernel Functions for SVM
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>Linear: <span class="math inline">\(k(x_1,x_2)=x_1\cdot x_2\)</span><br>
+</li>
+<li>Polynomial: <span class="math inline">\(k(x_1,x_2) = (\gamma \ x_1\cdot x_2 + c)^d\)</span><br>
+</li>
+<li>Gaussian or radial basis: <span class="math inline">\(k(x_1,x_2) = exp(-\gamma \|x_1-x_2\|^2)\)</span></li>
+</ul>
+</div>
+</div>
+<p>For a simpler classification data set this will work out in your favor, for today we will just run it to demonstrate a case when this method is not as appropriate. In the recipe we will standardize all the variables and then use default values when tuning each of the 5 levels we have.</p>
+<div class="cell" data-hash="vignette_cache/html/unnamed-chunk-14_d8365291f2b144c15bba31d0795f2b33">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>svm_rec <span class="ot">&lt;-</span> <span class="fu">recipe</span>(Species <span class="sc">~</span> Petal.Length <span class="sc">+</span> Petal.Width <span class="sc">+</span> Sepal.Length <span class="sc">+</span> Sepal.Width,</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="at">data =</span> iris_train) <span class="sc">%&gt;%</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_normalize</span>(<span class="fu">all_predictors</span>())</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>svm_linear_spec <span class="ot">&lt;-</span> <span class="fu">svm_poly</span>(<span class="at">degree =</span> <span class="dv">1</span>, <span class="at">cost =</span> <span class="fu">tune</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">"classification"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"kernlab"</span>)</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>svm_linear_wkflow <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(svm_rec) <span class="sc">%&gt;%</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(svm_linear_spec)</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>svm_linear_grid <span class="ot">&lt;-</span> <span class="fu">grid_regular</span>(<span class="fu">cost</span>(), <span class="fu">degree</span>(), <span class="at">levels =</span> <span class="dv">5</span>)</span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>svm_linear_res <span class="ot">&lt;-</span> <span class="fu">tune_grid</span>(svm_linear_wkflow,</span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>                            iris_folds, svm_linear_grid)</span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>svm_linear_res <span class="sc">%&gt;%</span> <span class="fu">autoplot</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="vignette_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Contrary to former assumptions, the roc-auc had its highest value at almost 1.0 which means it performed ideally. However, this perfect roc_auc and almost perfect accuracy could be attributed to over-fitting if it is miscalculated.</p>
+<p>Below we fit the linear kernel to the best metrics in case we want to show visualizations on it.</p>
+<div class="cell" data-hash="vignette_cache/html/unnamed-chunk-15_63406a33cc66347a0ca100bc671b185d">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>svm_best_linear <span class="ot">&lt;-</span> <span class="fu">select_best</span>(svm_linear_res)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>svm_final_linear_fit <span class="ot">&lt;-</span> <span class="fu">finalize_workflow</span>(svm_linear_wkflow, svm_best_linear) <span class="sc">%&gt;%</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="fu">fit</span>(iris_train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="radial-kernel" class="level3">
+<h3 class="anchored" data-anchor-id="radial-kernel">Radial Kernel</h3>
+<p>Doing the same method however now using a radial kernel we actually get lower results for ROC_AUC and accuracy which is odd for a couple reasons. Radial kernels work well for higher dimensional data which is what we have (Iris is a multi-class data set). On top of this, our outcome classes are not all linearly separable and radial kernels are also able to address this.</p>
+<div class="cell" data-hash="vignette_cache/html/unnamed-chunk-16_660121c96def813f634724e9569d8c3b">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>svm_rbf_spec <span class="ot">&lt;-</span> <span class="fu">svm_rbf</span>(<span class="at">cost=</span><span class="fu">tune</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">'classification'</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">'kernlab'</span>)</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>svm_rbf_wkflow <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(svm_rec) <span class="sc">%&gt;%</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(svm_rbf_spec)</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>svm_rbf_grid. <span class="ot">&lt;-</span> <span class="fu">grid_regular</span>(<span class="fu">cost</span>(),<span class="at">levels=</span><span class="dv">5</span>)</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>svm_rbf_res <span class="ot">&lt;-</span> <span class="fu">tune_grid</span>(svm_rbf_wkflow,</span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>                         iris_folds,svm_rbf_grid)</span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>svm_rbf_res <span class="sc">%&gt;%</span> <span class="fu">autoplot</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="vignette_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell" data-hash="vignette_cache/html/unnamed-chunk-17_e262e616e91116ef4a77df28d3201c97">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>svm_best_radial <span class="ot">&lt;-</span> <span class="fu">select_best</span>(svm_rbf_res)</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>svm_final_radial_fit <span class="ot">&lt;-</span> <span class="fu">finalize_workflow</span>(svm_rbf_wkflow, svm_best_radial) <span class="sc">%&gt;%</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="fu">fit</span>(iris_train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>In both kernels we extracted the best values and fitted them so we could get a final visual of the one that performed better. In the end we will make the educated choice of creating a confusion matrix based on the radial kernel to see the results of our predictions based on the test data. This is because a radial kernel in theory is much more suited for our data. Lastly it is good to note that we choose to use a confusion matrix because it makes the most sense for interpretability with a multiclass model.</p>
+<div class="cell" data-hash="vignette_cache/html/unnamed-chunk-18_e15dd8eb796bc1eb5169fabc60c29e06">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">augment</span>(svm_final_radial_fit, iris_test) <span class="sc">%&gt;%</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="fu">select</span>(Species, <span class="fu">starts_with</span>(<span class="st">".pred"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="fu">conf_mat</span>(Species, .pred_class) <span class="sc">%&gt;%</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(<span class="at">type =</span> <span class="st">"heatmap"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="vignette_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>As we expected the confusion matrix displays inaccuracies in distinguishing virginica and versicolor (the two species that were not said to be linearly separated from the setosa species).</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Takeaway
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In conclusion this section of the lab shows that support vector machines are versatile but have a lot things to look out for when clustering compared to k-means. You have to be aware of your data and its context. You must take different steps for multi-class models for example how to visualize their results.</p>
+</div>
+</div>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
