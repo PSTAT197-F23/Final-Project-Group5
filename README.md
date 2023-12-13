@@ -1,4 +1,4 @@
-# Final-Project-Group5
+# Vignette: Clustering Methods
 
 > Vignette on implementing clustering methods (k-means and hierarchical) using the well known iris data; created as a class project for PSTAT197A in Fall 2023.
 
